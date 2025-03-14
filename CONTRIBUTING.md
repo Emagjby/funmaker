@@ -1,6 +1,6 @@
-# Contributing to Bookmaker
+# Contributing to FunMaker
 
-Thanks for your interest in helping with Bookmaker! 🎉 This project is a labor of love, and we welcome contributions of all kinds.
+Thanks for your interest in helping with FunMaker! 🎉 This project is a labor of love, and we welcome contributions of all kinds.
 
 ## Getting Started
 
