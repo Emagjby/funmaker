@@ -1,4 +1,4 @@
-# 🎲 Bookmaker
+# 🎲 FunMaker
 
 Virtual sports betting platform where you can place wagers using points instead of real money. The betting odds change dynamically based on how people bet - just like in real betting markets!
 
