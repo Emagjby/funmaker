@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+dist
+build
+out
+.next
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor stuff
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+coverage
+
+# Misc
+.vercel
+.cache
+.turbo
+.eslintcache
+
+# My local notes
+notes.md
+TODO.md 
+project-structure.md
+roadmap.md
+SETUP_SUMMARY.md
+technical-implementation.md
+documentation.md
