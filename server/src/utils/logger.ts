@@ -14,7 +14,7 @@ export const logger = winston.createLogger({
     winston.format.splat(),
     logFormat
   ),
-  defaultMeta: { service: 'bookmaker-api' },
+  defaultMeta: { service: 'funmaker-api' },
   transports: [
     // Console transport
     new winston.transports.Console({

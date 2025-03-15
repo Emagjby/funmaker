@@ -2,7 +2,7 @@ import '../styles/globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Bookmaker | Virtual Sports Betting',
+  title: 'FunMaker | Virtual Sports Betting',
   description: 'Bet on sports and events with virtual points - no real money involved!',
 };
 

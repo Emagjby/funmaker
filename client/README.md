@@ -1,4 +1,4 @@
-# Bookmaker - Frontend
+# FunMaker - Frontend
 
 The React/Next.js frontend for our virtual betting platform. Built with Next.js App Router, TailwindCSS and TypeScript.
 

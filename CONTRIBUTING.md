@@ -6,7 +6,7 @@ Thanks for your interest in helping with FunMaker! 🎉 This project is a labor 
 
 ### Setup
 1. Fork the repo
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/bookmaker.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/funmaker.git`
 3. Install dependencies (see main README)
 4. Create a branch for your work: `git checkout -b feature/your-feature-name`
 
@@ -59,4 +59,4 @@ If you have questions or get stuck, open an issue! We're happy to help newcomers
 
 ## Thanks!
 
-Even small contributions are appreciated. Thanks for helping make Bookmaker better! 
+Even small contributions are appreciated. Thanks for helping make FunMaker better! 

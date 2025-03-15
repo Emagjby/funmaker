@@ -1,6 +1,6 @@
-# Bookmaker API
+# FunMaker API
 
-Express/TypeScript backend for the Bookmaker virtual betting platform.
+Express/TypeScript backend for the FunMaker virtual betting platform.
 
 ## Quick Start
 

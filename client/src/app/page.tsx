@@ -2,12 +2,12 @@ export default function Home() {
   // TODO: Add auth check later
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
-      <h1 className="text-4xl font-bold mb-4">Bookmaker</h1>
+      <h1 className="text-4xl font-bold mb-4">FunMaker</h1>
       <p className="text-xl mb-8">Risk-free betting with virtual points</p>
       
       <div className="max-w-3xl mb-10">
         <p className="mb-4">
-          Welcome to Bookmaker! Place bets on your favorite events using virtual points.
+          Welcome to FunMaker! Place bets on your favorite events using virtual points.
           Our smart odds system adjusts in real-time based on everyone&apos;s betting patterns.
         </p>
         

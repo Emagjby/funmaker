@@ -6,7 +6,7 @@ Virtual sports betting platform where you can place wagers using points instead 
 
 ## What's this all about?
 
-Ever wanted to try sports betting without risking actual money? Bookmaker lets you:
+Ever wanted to try sports betting without risking actual money? FunMaker lets you:
 
 - Bet on sports/events with virtual points (everybody starts with 1000)
 - Watch odds change in real-time based on betting patterns
@@ -38,8 +38,8 @@ The cool part is our dynamic odds system - as more people bet on an outcome, the
 
 Clone the repo:
 ```bash
-git clone https://github.com/yourusername/bookmaker.git
-cd bookmaker
+git clone https://github.com/Emagjby/funmaker.git
+cd funmaker
 ```
 
 Setup client:
