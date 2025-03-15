@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "jest",
+    "create-migration": "ts-node src/scripts/create-migration.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",

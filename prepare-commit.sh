@@ -5,7 +5,7 @@
 
 echo "🧹 Cleaning up before commit..."
 
-# Make sure all dependencies are installedf
+# Make sure all dependencies are installed
 echo "📦 Checking dependencies..."
 cd client && npm install
 cd ../server && npm install
