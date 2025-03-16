@@ -163,13 +163,14 @@ export const register = async (req: Request, res: Response) => {
  */
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
     // Validate input
     const validationErrors = [];
     
-    const emailError = validateEmail(email);
-    if (emailError) validationErrors.push(emailError);
+    if (!identifier || !identifier.trim()) {
+      validationErrors.push('Email or username is required');
+    }
     
     if (!password) {
       validationErrors.push('Password is required');
@@ -182,17 +183,40 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Sanitize input
-    const sanitizedEmail = email.trim().toLowerCase();
+    const sanitizedIdentifier = identifier.trim();
+    
+    // Check if identifier is an email or a username
+    const isEmail = /\S+@\S+\.\S+/.test(sanitizedIdentifier);
+    let email: string;
 
-    // Authenticate with Supabase Auth
+    if (isEmail) {
+      // If it's an email, use it directly for authentication
+      email = sanitizedIdentifier.toLowerCase();
+    } else {
+      // If it's a username, look up the email from the database
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('email')
+        .eq('username', sanitizedIdentifier)
+        .single();
+
+      if (userError || !userData) {
+        logger.error('Username lookup error:', userError);
+        return res.status(401).json({ error: 'Invalid email/username or password' });
+      }
+
+      email = userData.email;
+    }
+
+    // Authenticate with Supabase Auth using the email
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: sanitizedEmail,
+      email,
       password,
     });
 
     if (authError) {
       logger.error('Login error:', authError);
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: 'Invalid email/username or password' });
     }
 
     if (!authData.user) {

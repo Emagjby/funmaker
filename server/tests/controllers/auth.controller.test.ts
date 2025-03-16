@@ -11,6 +11,8 @@ jest.mock('../../src/db/supabase', () => ({
 import { register, login, getProfile } from '../../src/controllers/auth.controller';
 
 // Create a version of the login function for testing to avoid complex mocking issues
+// NOTE: This function is kept for reference but currently not used in tests
+/* 
 const loginForTest = async (req, res) => {
   try {
     // Basic validation - same as original
@@ -43,6 +45,7 @@ const loginForTest = async (req, res) => {
     return res.status(500).json({ error: 'Login failed' });
   }
 };
+*/
 
 describe('Auth Controller', () => {
   beforeEach(() => {
@@ -240,18 +243,47 @@ describe('Auth Controller', () => {
   });
 
   describe('login', () => {
-    it('should successfully log in a user', async () => {
+    it('should successfully log in a user with email', async () => {
       // Arrange
       const req = mockRequest({
         body: {
-          email: 'test@example.com',
+          identifier: 'test@example.com',
           password: 'Password123!'
         }
       });
       const res = mockResponse();
 
-      // Act - Use our test-specific implementation
-      await loginForTest(req, res);
+      // Mock Supabase auth response
+      mockSupabase.auth.signInWithPassword.mockResolvedValue({
+        data: {
+          user: { id: 'auth-user-123' },
+          session: { access_token: 'token-123' }
+        },
+        error: null
+      });
+
+      // Mock user data retrieval
+      mockSupabase.from.mockReturnThis();
+      mockSupabase.select.mockReturnThis();
+      mockSupabase.eq.mockReturnThis();
+      mockSupabase.single.mockResolvedValue({
+        data: {
+          id: 'db-user-123',
+          auth_id: 'auth-user-123',
+          email: 'test@example.com',
+          username: 'testuser',
+          points_balance: 1000,
+          profile_image_url: null,
+          is_active: true
+        },
+        error: null
+      });
+
+      // Mock update call
+      mockSupabase.update.mockReturnThis();
+
+      // Act
+      await login(req as any, res as any);
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(200);
@@ -260,19 +292,121 @@ describe('Auth Controller', () => {
           message: 'Login successful',
           user: expect.objectContaining({
             email: 'test@example.com',
-            username: 'testuser',
-            points_balance: 1000
+            username: 'testuser'
           })
         })
       );
+      // Should call signInWithPassword with email directly
+      expect(mockSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'Password123!'
+      });
     });
 
-    it('should return 400 when required fields are missing', async () => {
+    it('should successfully log in a user with username', async () => {
       // Arrange
       const req = mockRequest({
         body: {
-          // Missing password
-          email: 'test@example.com'
+          identifier: 'testuser',
+          password: 'Password123!'
+        }
+      });
+      const res = mockResponse();
+
+      // Mock username lookup
+      mockSupabase.from.mockReturnThis();
+      mockSupabase.select.mockReturnThis();
+      mockSupabase.eq.mockReturnThis();
+      mockSupabase.single.mockResolvedValueOnce({
+        data: { email: 'test@example.com' },
+        error: null
+      });
+
+      // Mock Supabase auth response
+      mockSupabase.auth.signInWithPassword.mockResolvedValue({
+        data: {
+          user: { id: 'auth-user-123' },
+          session: { access_token: 'token-123' }
+        },
+        error: null
+      });
+
+      // Mock user data retrieval
+      mockSupabase.single.mockResolvedValueOnce({
+        data: {
+          id: 'db-user-123',
+          auth_id: 'auth-user-123',
+          email: 'test@example.com',
+          username: 'testuser',
+          points_balance: 1000,
+          profile_image_url: null,
+          is_active: true
+        },
+        error: null
+      });
+
+      // Act
+      await login(req as any, res as any);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'Login successful',
+          user: expect.objectContaining({
+            email: 'test@example.com',
+            username: 'testuser'
+          })
+        })
+      );
+      // Should first look up the email by username
+      expect(mockSupabase.eq).toHaveBeenCalledWith('username', 'testuser');
+      // Then call signInWithPassword with the resolved email
+      expect(mockSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'Password123!'
+      });
+    });
+
+    it('should return 401 when username lookup fails', async () => {
+      // Arrange
+      const req = mockRequest({
+        body: {
+          identifier: 'nonexistentuser',
+          password: 'Password123!'
+        }
+      });
+      const res = mockResponse();
+
+      // Mock username lookup to fail
+      mockSupabase.from.mockReturnThis();
+      mockSupabase.select.mockReturnThis();
+      mockSupabase.eq.mockReturnThis();
+      mockSupabase.single.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'User not found' }
+      });
+
+      // Act
+      await login(req as any, res as any);
+
+      // Assert
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: 'Invalid email/username or password'
+        })
+      );
+      // Should not call signInWithPassword
+      expect(mockSupabase.auth.signInWithPassword).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 when identifier is missing', async () => {
+      // Arrange
+      const req = mockRequest({
+        body: {
+          // Missing identifier
+          password: 'Password123!'
         }
       });
       const res = mockResponse();
@@ -284,7 +418,7 @@ describe('Auth Controller', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: 'Password is required'
+          error: expect.stringContaining('Email or username is required')
         })
       );
     });
@@ -293,7 +427,7 @@ describe('Auth Controller', () => {
       // Arrange
       const req = mockRequest({
         body: {
-          email: 'test@example.com',
+          identifier: 'test@example.com',
           password: 'wrongpassword'
         }
       });
@@ -312,7 +446,7 @@ describe('Auth Controller', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          error: 'Invalid email or password'
+          error: 'Invalid email/username or password'
         })
       );
     });

@@ -11,11 +11,11 @@ export default function LoginForm() {
   const router = useRouter();
   const { login, authState } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
   const [errors, setErrors] = useState({
-    email: '',
+    identifier: '',
     password: '',
     form: ''
   });
@@ -28,9 +28,10 @@ export default function LoginForm() {
     }
   }, [authState, router, submitted]);
 
-  const validateEmail = (email: string): string => {
-    if (!email.trim()) return 'Email is required';
-    if (!/\S+@\S+\.\S+/.test(email)) return 'Email is invalid';
+  const validateIdentifier = (identifier: string): string => {
+    if (!identifier.trim()) return 'Email or username is required';
+    // Simple check for minimum length
+    if (identifier.trim().length < 3) return 'Email or username must be at least 3 characters';
     return '';
   };
 
@@ -42,7 +43,7 @@ export default function LoginForm() {
 
   const validateForm = () => {
     const newErrors = { 
-      email: validateEmail(formData.email),
+      identifier: validateIdentifier(formData.identifier),
       password: validatePassword(formData.password),
       form: ''
     };
@@ -61,7 +62,7 @@ export default function LoginForm() {
     // Live validation feedback
     if (errors[name as keyof typeof errors]) {
       let fieldError = '';
-      if (name === 'email') fieldError = validateEmail(value);
+      if (name === 'identifier') fieldError = validateIdentifier(value);
       else if (name === 'password') fieldError = validatePassword(value);
       
       setErrors({
@@ -82,22 +83,29 @@ export default function LoginForm() {
       return; // Don't proceed if validation fails
     }
     
-    // Only set submitted to true if validation passes
-    setSubmitted(true);
-    
     try {
+      console.log('Submitting login form with identifier:', formData.identifier.trim());
+      
+      // Only set submitted to true if validation passes
+      setSubmitted(true);
+      
       await login({
-        email: formData.email.trim(),
+        identifier: formData.identifier.trim(),
         password: formData.password,
       });
       
+      console.log('Login request completed - waiting for redirect');
       // Navigation is handled in the useEffect
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login submission error:', error);
+      
       setErrors({
         ...errors,
         form: error instanceof Error ? error.message : 'An unexpected error occurred'
       });
+      
+      // Reset submitted state to allow retrying
+      setSubmitted(false);
     }
   };
 
@@ -122,14 +130,14 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email"
-            type="email"
-            id="email"
-            name="email"
-            placeholder="you@example.com"
-            value={formData.email}
+            label="Email or Username"
+            type="text"
+            id="identifier"
+            name="identifier"
+            placeholder="you@example.com or your username"
+            value={formData.identifier}
             onChange={handleChange}
-            error={errors.email}
+            error={errors.identifier}
             fullWidth
             required
           />

@@ -133,12 +133,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Login function
-  const login = async ({ email, password }: LoginCredentials) => {
+  const login = async ({ identifier, password }: LoginCredentials) => {
     try {
       setAuthState({ ...authState, loading: true, error: null });
       
       // Use our API instead of Supabase's client directly
-      const response = await api.auth.login(email, password);
+      const response = await api.auth.login(identifier, password);
       
       setAuthState({
         user: response.user as User,
@@ -147,10 +147,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         error: null,
       });
     } catch (error) {
+      console.error('Login failed:', error);
+      
+      let errorMessage = 'Failed to login';
+      
+      if (error instanceof Error) {
+        // Handle network errors specially
+        if (error.message.includes('Failed to fetch') || 
+            error.message.includes('NetworkError') ||
+            error.message.includes('Network error')) {
+          errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setAuthState({
         ...authState,
         loading: false,
-        error: error instanceof Error ? error.message : 'Failed to login',
+        error: errorMessage
       });
     }
   };
