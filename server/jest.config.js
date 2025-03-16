@@ -2,26 +2,19 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        tsconfig: 'tsconfig.json',
-      },
-    ],
+    '^.+\\.tsx?$': ['ts-jest', {
+      isolatedModules: true,
+    }],
   },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
+    'src/**/*.ts',
     '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-    '!src/**/__tests__/**',
-    '!**/node_modules/**',
+    '!src/types/**/*.ts'
   ],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  maxWorkers: '50%',
 }; 

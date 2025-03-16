@@ -14,10 +14,6 @@ export const env = {
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
   
-  // JWT configuration
-  JWT_SECRET: process.env.JWT_SECRET || 'super-secret-key-change-in-production',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1d',
-  
   // Redis configuration
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   
@@ -29,7 +25,6 @@ export const env = {
     const requiredEnvVars = [
       'SUPABASE_URL',
       'SUPABASE_SERVICE_KEY',
-      'JWT_SECRET',
     ];
     
     if (process.env.NODE_ENV === 'production') {

@@ -1,4 +1,9 @@
-import 'dotenv/config';
+import path from 'path';
+import { config } from 'dotenv';
+
+// Try to load the .env file from the root directory
+config({ path: path.resolve(process.cwd(), '.env') });
+
 import app from './app';
 import { logger } from './utils/logger';
 import { initializeDatabase } from './db';

@@ -1,11 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
 import { Database } from '../types/database';
 import { logger } from '../utils/logger';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
 
 if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error('Missing Supabase environment variables');
@@ -27,22 +25,23 @@ export async function initializeDatabase() {
   try {
     logger.info('Initializing database...');
     
-    // Read the schema SQL file
-    const schemaPath = path.join(__dirname, 'schema.sql');
-    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-    
-    // Execute the schema SQL
-    const { error } = await supabase.query(schemaSql);
+    // Verify database connection by checking if we can access the users table
+    const { error } = await supabase
+      .from('users')
+      .select('id')
+      .limit(1);
     
     if (error) {
+      logger.error('Database connection error', error);
       throw error;
     }
-
-    logger.info('Database initialized successfully');
+    
+    logger.info('Database connection successful');
+    return true;
   } catch (error) {
     logger.error('Failed to initialize database', error);
     throw error;
   }
 }
 
-export default supabase; 
+export { supabase }; 

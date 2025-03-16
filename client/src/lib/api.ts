@@ -2,7 +2,8 @@
  * API client for making requests to the backend
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Always use the production API URL
+const API_URL = 'https://api.emagjby.com';
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -34,6 +35,7 @@ async function request<T = Record<string, unknown>>(
   const config: RequestInit = {
     method,
     headers: requestHeaders,
+    credentials: 'include',
   };
   
   if (body) {
@@ -43,13 +45,23 @@ async function request<T = Record<string, unknown>>(
   try {
     const response = await fetch(url, config);
     
-    const data = await response.json();
+    // Handle non-JSON responses
+    const contentType = response.headers.get('content-type');
+    const data = contentType && contentType.includes('application/json') 
+      ? await response.json() 
+      : await response.text();
     
     if (!response.ok) {
-      throw new Error(data.message || 'Something went wrong');
+      const errorMessage = typeof data === 'object' && data.error 
+        ? data.error 
+        : typeof data === 'string' 
+          ? data 
+          : 'Something went wrong';
+      
+      throw new Error(errorMessage);
     }
     
-    return data;
+    return data as T;
   } catch (error) {
     if (error instanceof Error) {
       throw error;
@@ -64,9 +76,19 @@ async function request<T = Record<string, unknown>>(
 export const api = {
   auth: {
     login: (email: string, password: string) => 
-      request('/auth/login', { method: 'POST', body: { email, password } }),
+      request<{ user: Record<string, any>; session: { access_token: string } }>('/auth/login', { 
+        method: 'POST', 
+        body: { email, password } 
+      }),
     register: (username: string, email: string, password: string) => 
-      request('/auth/register', { method: 'POST', body: { username, email, password } }),
+      request<{ user: Record<string, any>; session: { access_token: string } }>('/auth/register', { 
+        method: 'POST', 
+        body: { username, email, password } 
+      }),
+    profile: (token: string) =>
+      request('/auth/profile', { token }),
+    updateProfile: (data: Record<string, unknown>, token: string) =>
+      request('/auth/profile', { method: 'PUT', body: data, token }),
   },
   
   events: {

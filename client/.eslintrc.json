@@ -10,5 +10,13 @@
     "@typescript-eslint/no-explicit-any": "warn",
     "react/prop-types": "off",
     "react/react-in-jsx-scope": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/api.ts", "src/lib/supabase.ts", "src/types/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
 } 

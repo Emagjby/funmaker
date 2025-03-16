@@ -4,12 +4,16 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
-    "build": "tsc",
     "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest",
-    "create-migration": "ts-node src/scripts/create-migration.ts"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:security": "jest --testMatch='**/tests/security/**/*.test.ts'",
+    "test:api": "jest --testMatch='**/tests/controllers/**/*.test.ts'",
+    "test:unit": "jest --testMatch='**/tests/services/**/*.test.ts' --testMatch='**/tests/middleware/**/*.test.ts'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",
